@@ -1,4 +1,4 @@
-# Nicovideo RSS DYI
+# Nicovideo RSS Generator
 
 提供終了したニコニコ動画新着動画RSSを擬似的に復活させるサーバーソフトウェア。  
 設定された検索内容を用いてAPIから動画一覧を取得し、RSS形式で提供する。更新間隔は15分である。  
