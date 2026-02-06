@@ -5,6 +5,51 @@
 
 Docker Composeを用いて稼働させることを想定している。
 
+<details>
+
+<summary>生成されるRSSのサンプル</summary>
+
+```xml
+<rss version="2.0">
+  <channel>
+    <title>Nicovideo RSS DIY</title>
+    <link>https://www.nicovideo.jp/</link>
+    <description>ニコニコ動画新着RSS(自作)</description>
+    <item>
+      <title>動画タイトル</title>
+      <link>視聴URL</link>
+      <description>動画説明文(XML特殊文字エスケープ有り)</description>
+      <pubDate>投稿日時</pubDate>
+      <guid isPermaLink="true">視聴URL</guid>
+      <enclosure url="サムネイルURL" length="サムネイル画像サイズ" type="image/jpeg"></enclosure>
+      <category domain="タグ検索URL">タグ名</category>
+      <category domain="タグ検索URL2">タグ名2</category>
+    </item>
+    <item>
+      <title>新・豪血寺一族 -煩悩解放 - レッツゴー！陰陽師</title>
+      <link>https://nico.ms/sm9</link>
+      <description>レッツゴー！陰陽師（フルコーラスバージョン）</description>
+      <pubDate>06 Mar 07 00:33 JST</pubDate>
+      <guid isPermaLink="true">https://nico.ms/sm9</guid>
+      <enclosure url="https://nicovideo.cdn.nimg.jp/thumbnails/9/9" length="6337" type="image/jpeg"></enclosure>
+      <category domain="https://www.nicovideo.jp/tag/%E9%99%B0%E9%99%BD%E5%B8%AB">陰陽師</category>
+      <category domain="https://www.nicovideo.jp/tag/%E3%83%AC%E3%83%83%E3%83%84%E3%82%B4%E3%83%BC%EF%BC%81%E9%99%B0%E9%99%BD%E5%B8%AB">レッツゴー！陰陽師</category>
+      <category domain="https://www.nicovideo.jp/tag/%E5%85%AC%E5%BC%8F">公式</category>
+      <category domain="https://www.nicovideo.jp/tag/%E9%9F%B3%E6%A5%BD">音楽</category>
+      <category domain="https://www.nicovideo.jp/tag/%E3%82%B2%E3%83%BC%E3%83%A0">ゲーム</category>
+      <category domain="https://www.nicovideo.jp/tag/%E5%BC%BE%E5%B9%95%E5%8B%95%E7%94%BB">弾幕動画</category>
+      <category domain="https://www.nicovideo.jp/tag/%E4%BC%9D%E8%AA%AC">伝説</category>
+      <category domain="https://www.nicovideo.jp/tag/%E6%9C%80%E5%8F%A4%E3%81%AE%E5%8B%95%E7%94%BB">最古の動画</category>
+      <category domain="https://www.nicovideo.jp/tag/3%E6%9C%886%E6%97%A5%E6%8A%95%E7%A8%BF%E5%8B%95%E7%94%BB">3月6日投稿動画</category>
+      <category domain="https://www.nicovideo.jp/tag/%E9%87%8D%E8%A6%81%E3%83%8B%E3%82%B3%E3%83%8B%E3%82%B3%E6%96%87%E5%8C%96%E8%B2%A1">重要ニコニコ文化財</category>
+      <category domain="https://www.nicovideo.jp/tag/sm9">sm9</category>
+    </item>
+  </channel>
+</rss>
+```
+
+</details>
+
 ## 設定
 
 config.jsonに記述し、docker-compose.yml内で`/config/config.json`へとバインドマウントする。
