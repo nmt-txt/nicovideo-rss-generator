@@ -3,6 +3,7 @@ package rss
 import (
 	"encoding/xml"
 	"fmt"
+	"nicovideoRSSDIY/internal/config"
 	"nicovideoRSSDIY/internal/repository"
 	"time"
 )
@@ -46,29 +47,33 @@ type Category struct {
 func GenerateRSS(
 	notifications []repository.Notification,
 	videos []*repository.Video,
+	config *config.RssGenerator,
 ) ([]byte, error) {
 	items := make([]Item, 0, len(notifications)+len(videos))
-	for _, n := range notifications {
-		desc := n.Description.Error()
-		if n.AllowDuplication && n.DuplicateCount > 0 {
-			desc += fmt.Sprintf("(重複: %d件)", n.DuplicateCount+1)
+
+	if !config.SuppressSystemMessage {
+		for _, n := range notifications {
+			desc := n.Description.Error()
+			if n.AllowDuplication && n.DuplicateCount > 0 {
+				desc += fmt.Sprintf("(重複: %d件)", n.DuplicateCount+1)
+			}
+
+			title := fmt.Sprintf("[%s] %s", n.Level.String(), n.Title)
+
+			guid := GUID{
+				Value:       fmt.Sprintf("%d-%s", n.Date.Unix(), title),
+				IsPermaLink: false,
+			}
+
+			items = append(items, Item{
+				Title:       title,
+				Description: desc,
+				PubDate:     n.Date.Format(time.RFC822),
+				GUID:        guid,
+				Enclosure:   nil,
+				Category:    nil,
+			})
 		}
-
-		title := fmt.Sprintf("[%s] %s", n.Level.String(), n.Title)
-
-		guid := GUID{
-			Value:       fmt.Sprintf("%d-%s", n.Date.Unix(), title),
-			IsPermaLink: false,
-		}
-
-		items = append(items, Item{
-			Title:       title,
-			Description: desc,
-			PubDate:     n.Date.Format(time.RFC822),
-			GUID:        guid,
-			Enclosure:   nil,
-			Category:    nil,
-		})
 	}
 
 	for _, v := range videos {
@@ -111,9 +116,9 @@ func GenerateRSS(
 	rss := RSS{
 		Version: "2.0",
 		Channel: Channel{
-			Title:       "Nicovideo RSS DIY",
-			Link:        "https://www.nicovideo.jp/",
-			Description: "ニコニコ動画新着RSS(自作)",
+			Title:       config.Title,
+			Link:        config.Link,
+			Description: config.Description,
 			Items:       items,
 		},
 	}
