@@ -61,13 +61,48 @@ config.jsonに記述し、docker-compose.yml内で`/config/config.json`へとバ
     "searchQueries": [
         {"query": "VOCALOID"},
         {"query": "ソフトウェアトーク車載 OR ソフトウェアトーク旅行"},
-    ],
-    "log": "info"
+    ]
 }
 ```
 
 この場合`VOCALOID` と `ソフトウェアトーク車載 OR ソフトウェアトーク旅行`の2つで検索を行い結果を混ぜた上で、最新順200件をフィードに表示する。検索タグの数に上限はないものの1つ増やせば1分[更新作業が長くなる](#制限)(おそらくフィードが空な起動直後しか気にならないと思われるが)。  
 logの部分は任意。infoと指定した場合はinfo以上のログのみ出力される(error > info > debug. 省略時: info)
+
+<details>
+
+<summary>その他の設定項目</summary>
+
+サンプル:
+
+```json
+{
+    "searchQueries": [
+        {"query": "VOCALOID OR SynthesizerV OR NEUTRINO OR ソフトウェアシンガー"}
+    ],
+    "log": "debug",
+    "rssGenerator": {
+        "title": "カスタムRSSタイトル",
+        "link": "https://カスタムRSS-link-URL.net",
+        "description": "カスタムRSS description",
+        "suppressSystemMessage": true
+    }
+}
+
+```
+
+- `log`(string, 省略時:info)
+  - ログレベルを指定する。error > info > debugで、指定したもの以上のログのみ出力する
+  - 例:infoを指定した場合、errorとinfoのみ出力する
+- `rssGenerator`(省略可能)
+  - RSS生成部にかかわる設定を行う。ブロックごと省略可能である。ほとんどはRSSの要素をデフォルト値から変更するためにある。省略時の値は上部「生成されるRSSのサンプル」内を参照
+  - `title`(string)
+  - `link`(string)
+  - `description`(string)
+  - `suppressSystemMessage`(bool)
+    - 「\[INFO\]サーバーの更新を待っています」のようなアプリケーション由来のメッセージをRSSへ出力する機能を無効にする
+    - RSSを人が読む場合はおおよそメリットのある機能だと思われるが、RSSを更に機械で処理する場合などは邪魔になるため、無効化する方が良いだろう
+  
+</details>
 
 ## 起動・終了
 
