@@ -47,11 +47,11 @@ type Category struct {
 func GenerateRSS(
 	notifications []repository.Notification,
 	videos []*repository.Video,
-	config *config.RssGenerator,
+	rssConfig *config.RssGenerator,
 ) ([]byte, error) {
 	items := make([]Item, 0, len(notifications)+len(videos))
 
-	if !config.SuppressSystemMessage {
+	if !rssConfig.ShouldSuppressSystemMessage {
 		for _, n := range notifications {
 			desc := n.Description.Error()
 			if n.AllowDuplication && n.DuplicateCount > 0 {
@@ -116,9 +116,9 @@ func GenerateRSS(
 	rss := RSS{
 		Version: "2.0",
 		Channel: Channel{
-			Title:       config.Title,
-			Link:        config.Link,
-			Description: config.Description,
+			Title:       rssConfig.Title,
+			Link:        rssConfig.Link,
+			Description: rssConfig.Description,
 			Items:       items,
 		},
 	}

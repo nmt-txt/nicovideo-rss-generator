@@ -16,10 +16,10 @@ type System struct {
 }
 
 type RssGenerator struct {
-	Title                 string `json:"title"`
-	Description           string `json:"description"`
-	Link                  string `json:"link"`
-	SuppressSystemMessage bool   `json:"suppressSystemMessage"`
+	Title                       string `json:"title"`
+	Description                 string `json:"description"`
+	Link                        string `json:"link"`
+	ShouldSuppressSystemMessage bool   `json:"shouldSuppressSystemMessage"`
 }
 
 type Config struct {
@@ -36,10 +36,10 @@ func LoadConfig(fileContents []byte) (*Config, error) {
 	cfg.Log = "info"
 	cfg.System = System{Version: "1.0.1"}
 	cfg.RssGenerator = RssGenerator{
-		Title:                 "Nicovideo RSS DIY",
-		Description:           "ニコニコ動画新着RSS(自作)",
-		Link:                  "https://www.nicovideo.jp/",
-		SuppressSystemMessage: false,
+		Title:                       "Nicovideo RSS DIY",
+		Description:                 "ニコニコ動画新着RSS(自作)",
+		Link:                        "https://www.nicovideo.jp/",
+		ShouldSuppressSystemMessage: false,
 	}
 	if err := json.Unmarshal(fileContents, &cfg); err != nil {
 		return nil, fmt.Errorf("設定ファイルの読み込みに失敗しました: %w", err)
