@@ -88,7 +88,7 @@ config.jsonに記述し、docker-compose.yml内で`/config/config.json`へとバ
         "title": "カスタムRSSタイトル",
         "link": "https://カスタムRSS-link-URL.net",
         "description": "カスタムRSS description",
-        "suppressSystemMessage": true
+        "shouldSuppressSystemMessage": true
     },
     "videoFetcher": {
         "shouldFetchThumbnail": true
