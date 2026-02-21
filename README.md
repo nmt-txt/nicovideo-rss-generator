@@ -21,7 +21,7 @@ Docker Composeを用いて稼働させることを想定している。
       <description>動画説明文(XML特殊文字エスケープ有り)</description>
       <pubDate>投稿日時</pubDate>
       <guid isPermaLink="true">視聴URL</guid>
-      <enclosure url="サムネイルURL" length="サムネイル画像サイズ" type="image/jpeg"></enclosure>
+      <enclosure url="サムネイルURL(shouldFetchThumbnail=true時のみ存在)" length="サムネイル画像サイズ" type="image/jpeg"></enclosure>
       <category domain="タグ検索URL">タグ名</category>
       <category domain="タグ検索URL2">タグ名2</category>
     </item>
@@ -61,11 +61,15 @@ config.jsonに記述し、docker-compose.yml内で`/config/config.json`へとバ
     "searchQueries": [
         {"query": "VOCALOID"},
         {"query": "ソフトウェアトーク車載 OR ソフトウェアトーク旅行"},
-    ]
+    ],
+    "videoFetcher": {
+        "shouldFetchThumbnail": false
+    }
 }
 ```
 
 この場合`VOCALOID` と `ソフトウェアトーク車載 OR ソフトウェアトーク旅行`の2つで検索を行い結果を混ぜた上で、最新順200件をフィードに表示する。検索タグの数に上限はないものの1つ増やせば1分[更新作業が長くなる](#制限)(おそらくフィードが空な起動直後しか気にならないと思われるが)。  
+画像を表示できるRSSリーダーの場合、`shouldFetchThumbnail`の後にある`false`を`true`に書き換えることで動画サムネイル情報が付与されるようになる。  
 
 <details>
 
@@ -84,6 +88,9 @@ config.jsonに記述し、docker-compose.yml内で`/config/config.json`へとバ
         "link": "https://カスタムRSS-link-URL.net",
         "description": "カスタムRSS description",
         "suppressSystemMessage": true
+    },
+    "videoFetcher": {
+        "shouldFetchThumbnail": true
     }
 }
 
@@ -100,6 +107,11 @@ config.jsonに記述し、docker-compose.yml内で`/config/config.json`へとバ
   - `suppressSystemMessage`(bool)
     - 「\[INFO\]サーバーの更新を待っています」のようなアプリケーション由来のメッセージをRSSへ出力する機能を無効にする
     - RSSを人が読む場合はおおよそメリットのある機能だと思われるが、RSSを更に機械で処理する場合などは邪魔になるため、無効化する方が良いだろう
+- `videoFetcher`(省略可能)
+  - 動画情報取得部にかかわる設定を行う。ブロックごと省略可能である。
+  - `shouldFetchThumbnail`(bool, 省略時:false)
+    - 動画サムネイル情報を取得するかどうかを指定する
+    - 全てのリーダーがenclosureの画像を表示するわけではない。必要な場合にのみ取得することで、余計な処理時間とリクエストを削減する
   
 </details>
 
