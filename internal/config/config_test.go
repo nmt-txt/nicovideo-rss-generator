@@ -1,20 +1,18 @@
 package config
 
 import (
-	"os"
-	"path/filepath"
 	"testing"
 )
 
 func TestLoadConfig_Success(t *testing.T) {
-	path := writeConfigTempFile(t, `{
+	contents := []byte(`{
 		"searchQueries": [
 	        {"query": "  VOCALOID  "},
 	        {"query": "ソフトウェアトーク劇場"}
 	    ],
 	    "log": "DEBUG"
 	}`)
-	cfg, err := LoadConfig(path)
+	cfg, err := LoadConfig(contents)
 	if err != nil {
 		t.Fatalf("LoadConfig error: %v", err)
 	}
@@ -29,30 +27,72 @@ func TestLoadConfig_Success(t *testing.T) {
 }
 
 func TestLoadConfig_InvalidLog(t *testing.T) {
-	path := writeConfigTempFile(t, `{
+	contents := []byte(`{
 	    "searchQueries": [{"query": "foo"}],
 	    "log": "trace"
 	}`)
-	if _, err := LoadConfig(path); err == nil {
+	if _, err := LoadConfig(contents); err == nil {
 		t.Fatalf("expected error for invalid log")
 	}
 }
 
 func TestLoadConfig_InvalidQuery(t *testing.T) {
-	path := writeConfigTempFile(t, `{
+	contents := []byte(`{
 	    "searchQueries": [{"query": ""}],
 	    "log": "info"
 	}`)
-	if _, err := LoadConfig(path); err == nil {
+	if _, err := LoadConfig(contents); err == nil {
 		t.Fatalf("expected error for invalid query")
 	}
 }
 
-func TestLoadConfig_DefaultLogUsed(t *testing.T) {
-	path := writeConfigTempFile(t, `{
+func TestLoadConfig_RSSGenerator(t *testing.T) {
+	contents := []byte(`{
+	    "searchQueries": [{"query": "foo"}],
+	    "rssGenerator": {
+	        "title": "Custom RSS Title",
+	        "description": "Custom RSS Description",
+	        "link": "https://example.com/custom"
+	    }
+	}`)
+	cfg, err := LoadConfig(contents)
+	if err != nil {
+		t.Fatalf("LoadConfig error: %v", err)
+	}
+
+	if cfg.RssGenerator.Title != "Custom RSS Title" {
+		t.Fatalf("expected \"Custom RSS Title\", got %q", cfg.RssGenerator.Title)
+	}
+	if cfg.RssGenerator.Description != "Custom RSS Description" {
+		t.Fatalf("expected \"Custom RSS Description\", got %q", cfg.RssGenerator.Description)
+	}
+	if cfg.RssGenerator.Link != "https://example.com/custom" {
+		t.Fatalf("expected \"https://example.com/custom\", got %q", cfg.RssGenerator.Link)
+	}
+}
+
+func TestLoadConfig_VideoFetcher(t *testing.T) {
+	contents := []byte(`{
+	    "searchQueries": [{"query": "foo"}],
+	    "videoFetcher": {
+	        "shouldFetchThumbnail": true
+	    }
+	}`)
+	cfg, err := LoadConfig(contents)
+	if err != nil {
+		t.Fatalf("LoadConfig error: %v", err)
+	}
+
+	if !cfg.VideoFetcher.ShouldFetchThumbnail {
+		t.Fatalf("expected shouldFetchThumbnail to be true")
+	}
+}
+
+func TestLoadConfig_DefaultFallBack(t *testing.T) {
+	contents := []byte(`{
 	    "searchQueries": [{"query": "foo"}]
 	}`)
-	cfg, err := LoadConfig(path)
+	cfg, err := LoadConfig(contents)
 	if err != nil {
 		t.Fatalf("LoadConfig error: %v", err)
 	}
@@ -60,13 +100,20 @@ func TestLoadConfig_DefaultLogUsed(t *testing.T) {
 	if cfg.Log != "info" {
 		t.Fatalf("expected log default to info, got %q", cfg.Log)
 	}
-}
 
-func writeConfigTempFile(t *testing.T, content string) string {
-	t.Helper()
-	path := filepath.Join(t.TempDir(), "config.json")
-	if err := os.WriteFile(path, []byte(content), 0o600); err != nil {
-		t.Fatalf("write config file: %v", err)
+	// RSS Generator デフォルト確認
+	if cfg.RssGenerator.Title != "Nicovideo RSS DIY" {
+		t.Fatalf("expected default RSS title, got %q", cfg.RssGenerator.Title)
 	}
-	return path
+	if cfg.RssGenerator.Description != "ニコニコ動画新着RSS(自作)" {
+		t.Fatalf("expected default RSS description, got %q", cfg.RssGenerator.Description)
+	}
+	if cfg.RssGenerator.Link != "https://www.nicovideo.jp/" {
+		t.Fatalf("expected default RSS link, got %q", cfg.RssGenerator.Link)
+	}
+
+	// Video Fetcher デフォルト確認
+	if cfg.VideoFetcher.ShouldFetchThumbnail {
+		t.Fatalf("expected default shouldFetchThumbnail to be false")
+	}
 }

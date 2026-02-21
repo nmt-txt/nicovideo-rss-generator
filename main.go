@@ -29,7 +29,12 @@ func main() {
 		configDirPath = os.Args[1]
 	}
 
-	cfg, err := config.LoadConfig(filepath.Join(configDirPath, "config.json"))
+	configBytes, err := os.ReadFile(filepath.Join(configDirPath, "config.json"))
+	if err != nil {
+		panic(fmt.Sprintf("設定ファイルの読み込みに失敗しました: %v", err))
+	}
+
+	cfg, err := config.LoadConfig(configBytes)
 	if err != nil {
 		panic(fmt.Sprintf("設定ファイルの読込・解析に失敗しました: %v", err))
 	}
@@ -76,7 +81,7 @@ func main() {
 		},
 	})
 
-	rssBytes, err := rss.GenerateRSS(nRepo.Notifications, vRepo.Videos)
+	rssBytes, err := rss.GenerateRSS(nRepo.Notifications, vRepo.Videos, &cfg.RssGenerator)
 	if err != nil {
 		panic(fmt.Sprintf("RSSの生成に失敗しました: %v", err))
 	}
@@ -101,7 +106,7 @@ func main() {
 		}
 	}()
 
-	go worker(ctx, vRepo, nRepo, rRepo, cfg.SearchQueries, cfg.System)
+	go worker(ctx, vRepo, nRepo, rRepo, cfg)
 
 	// シャットダウン
 	<-ctx.Done()
@@ -121,11 +126,10 @@ func worker(
 	vRepo *repository.VideoRepository,
 	nRepo *repository.NotificationRepository,
 	rRepo *repository.RSSRepository,
-	queries []config.SearchQuery,
-	system config.System,
+	cfg *config.Config,
 ) {
-	vClient := client.NewVideoClient("https://snapshot.search.nicovideo.jp/api/v2/snapshot", fmt.Sprintf("nicovideo-rss-diy/%s service", system.Version))
-	tClient := client.NewThumbnailClient(fmt.Sprintf("nicovideo-rss-diy/%s service", system.Version))
+	vClient := client.NewVideoClient("https://snapshot.search.nicovideo.jp/api/v2/snapshot", fmt.Sprintf("nicovideo-rss-diy/%s service", cfg.System.Version))
+	tClient := client.NewThumbnailClient(fmt.Sprintf("nicovideo-rss-diy/%s service", cfg.System.Version))
 
 	// queriesに基づき動画検索を行いvRepoに追加する。クエリとクエリの間に1分待機する
 	doVideo := func(
@@ -300,7 +304,7 @@ func worker(
 
 		t := time.Now() // for debug output
 		if searchStart.Before(noNewDataLater.Add(LOOP_INTERVAL)) {
-			doVideo(ctx, vRepo, nRepo, vClient, queries, searchStart, searchEnd)
+			doVideo(ctx, vRepo, nRepo, vClient, cfg.SearchQueries, searchStart, searchEnd)
 		} else {
 			slog.Debug("### Update skipped, there are no new data")
 			nRepo.AddNotification(
@@ -310,7 +314,14 @@ func worker(
 				true,
 			)
 		}
-		doThumbnail(ctx, vRepo, nRepo, tClient) // 別に上のifへ入れてもいいが全部揃っているならリクエストしないしエラーなどで不足あれば取得した方が良いので
+
+		if cfg.VideoFetcher.ShouldFetchThumbnail {
+			// 別に上のifへ入れてもいいが、サムネイル全部揃っているなら追加リクエストしないし
+			// 前回ループでエラーなどで不足あれば取得した方が良いので
+			doThumbnail(ctx, vRepo, nRepo, tClient)
+		}
+		// ↑によりfalseの場合サムネイルはURLだけ揃っている状態だが、
+		// RSS生成部は全部データが揃っているときのみフィードにデータを加えるので問題ない
 
 		lastModified, err := vClient.FetchLastModified(ctx)
 		if err != nil {
@@ -323,7 +334,7 @@ func worker(
 		slog.Debug(fmt.Sprintf("動画データは %s 時点まで存在", noNewDataLater.Format(time.RFC3339)))
 		slog.Debug(fmt.Sprintf("### All done! (%s)", time.Since(t)))
 
-		rssBytes, err := rss.GenerateRSS(nRepo.Notifications, vRepo.Videos)
+		rssBytes, err := rss.GenerateRSS(nRepo.Notifications, vRepo.Videos, &cfg.RssGenerator)
 		if err != nil {
 			panic(fmt.Sprintf("RSSの生成に失敗しました: %v", err))
 		}
