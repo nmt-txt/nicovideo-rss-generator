@@ -52,7 +52,7 @@ func LoadConfig(fileContents []byte) (*Config, error) {
 
 	// アンマーシャル
 	if err := json.Unmarshal(fileContents, &cfg); err != nil {
-		return nil, fmt.Errorf("設定ファイルの読み込みに失敗しました: %w", err)
+		return nil, fmt.Errorf("設定ファイルのjson構造解析に失敗しました: %w", err)
 	}
 
 	// 調整
