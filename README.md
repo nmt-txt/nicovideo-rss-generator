@@ -105,7 +105,7 @@ config.jsonに記述し、docker-compose.yml内で`/config/config.json`へとバ
   - `title`(string)
   - `link`(string)
   - `description`(string)
-  - `suppressSystemMessage`(bool)
+  - `shouldSuppressSystemMessage`(bool)
     - 「\[INFO\]サーバーの更新を待っています」のようなアプリケーション由来のメッセージをRSSへ出力する機能を無効にする
     - RSSを人が読む場合はおおよそメリットのある機能だと思われるが、RSSを更に機械で処理する場合などは邪魔になるため、無効化する方が良いだろう
 - `videoFetcher`(省略可能)
