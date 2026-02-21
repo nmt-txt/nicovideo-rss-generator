@@ -22,11 +22,16 @@ type RssGenerator struct {
 	ShouldSuppressSystemMessage bool   `json:"shouldSuppressSystemMessage"`
 }
 
+type VideoFetcher struct {
+	ShouldFetchThumbnail bool `json:"shouldFetchThumbnail"`
+}
+
 type Config struct {
 	SearchQueries []SearchQuery `json:"searchQueries"`
 	Log           string        `json:"log,omitempty"`
 	System        System        `json:"-"`
 	RssGenerator  RssGenerator  `json:"rssGenerator"`
+	VideoFetcher  VideoFetcher  `json:"videoFetcher"`
 }
 
 // LoadConfig 設定ファイルを読み込み、検証して返す。
@@ -41,6 +46,11 @@ func LoadConfig(fileContents []byte) (*Config, error) {
 		Link:                        "https://www.nicovideo.jp/",
 		ShouldSuppressSystemMessage: false,
 	}
+	cfg.VideoFetcher = VideoFetcher{
+		ShouldFetchThumbnail: false,
+	}
+
+	// アンマーシャル
 	if err := json.Unmarshal(fileContents, &cfg); err != nil {
 		return nil, fmt.Errorf("設定ファイルの読み込みに失敗しました: %w", err)
 	}

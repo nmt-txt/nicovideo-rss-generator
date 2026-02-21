@@ -314,7 +314,14 @@ func worker(
 				true,
 			)
 		}
-		doThumbnail(ctx, vRepo, nRepo, tClient) // 別に上のifへ入れてもいいが全部揃っているならリクエストしないしエラーなどで不足あれば取得した方が良いので
+
+		if cfg.VideoFetcher.ShouldFetchThumbnail {
+			// 別に上のifへ入れてもいいが、サムネイル全部揃っているなら追加リクエストしないし
+			// 前回ループでエラーなどで不足あれば取得した方が良いので
+			doThumbnail(ctx, vRepo, nRepo, tClient)
+		}
+		// ↑によりfalseの場合サムネイルはURLだけ揃っている状態だが、
+		// RSS生成部は全部データが揃っているときのみフィードにデータを加えるので問題ない
 
 		lastModified, err := vClient.FetchLastModified(ctx)
 		if err != nil {

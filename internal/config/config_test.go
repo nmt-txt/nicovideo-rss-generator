@@ -71,6 +71,23 @@ func TestLoadConfig_RSSGenerator(t *testing.T) {
 	}
 }
 
+func TestLoadConfig_VideoFetcher(t *testing.T) {
+	contents := []byte(`{
+	    "searchQueries": [{"query": "foo"}],
+	    "videoFetcher": {
+	        "shouldFetchThumbnail": true
+	    }
+	}`)
+	cfg, err := LoadConfig(contents)
+	if err != nil {
+		t.Fatalf("LoadConfig error: %v", err)
+	}
+
+	if !cfg.VideoFetcher.ShouldFetchThumbnail {
+		t.Fatalf("expected shouldFetchThumbnail to be true")
+	}
+}
+
 func TestLoadConfig_DefaultFallBack(t *testing.T) {
 	contents := []byte(`{
 	    "searchQueries": [{"query": "foo"}]
@@ -93,5 +110,10 @@ func TestLoadConfig_DefaultFallBack(t *testing.T) {
 	}
 	if cfg.RssGenerator.Link != "https://www.nicovideo.jp/" {
 		t.Fatalf("expected default RSS link, got %q", cfg.RssGenerator.Link)
+	}
+
+	// Video Fetcher デフォルト確認
+	if cfg.VideoFetcher.ShouldFetchThumbnail {
+		t.Fatalf("expected default shouldFetchThumbnail to be false")
 	}
 }

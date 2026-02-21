@@ -90,6 +90,8 @@ func GenerateRSS(
 		}
 
 		// あればサムネイルを付与
+		// shouldFetchThumbnail=falseのとき、URLだけ入っているため他プロパティもチェックすること
+		// あと動画が削除されたときも同様。APIは反映に1日かかるがサムネイルはすぐ消える
 		if v.ThumbnailURL != "" && v.ThumbnailType != "" && v.ThumbnailLength > 0 {
 			item.Enclosure = &Enclosure{
 				URL:    v.ThumbnailURL,
