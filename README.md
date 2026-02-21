@@ -19,7 +19,7 @@ Docker Composeを用いて稼働させることを想定している。
       <title>動画タイトル</title>
       <link>視聴URL</link>
       <description>動画説明文(XML特殊文字エスケープ有り)</description>
-      <pubDate>投稿日時</pubDate>
+      <pubDate>投稿日時(RFC 822)</pubDate>
       <guid isPermaLink="true">視聴URL</guid>
       <enclosure url="サムネイルURL(shouldFetchThumbnail=true時のみ存在)" length="サムネイル画像サイズ" type="image/jpeg"></enclosure>
       <category domain="タグ検索URL">タグ名</category>
@@ -52,7 +52,8 @@ Docker Composeを用いて稼働させることを想定している。
 
 ## 設定
 
-config.jsonに記述し、docker-compose.yml内で`/config/config.json`へとバインドマウントする。
+config.jsonに記述し、docker-compose.yml内で`/config/config.json`へとバインドマウントする。  
+設定ファイルを変更した場合、ソフトウェアの再起動が必要である。
 
 記述例:
 
