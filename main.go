@@ -92,8 +92,8 @@ func main() {
 		// これでいいのか?
 		slog.Info("HTTP_REQUEST", slog.String("method", r.Method), slog.String("path", r.URL.Path), slog.String("user-agent", r.UserAgent()))
 		w.Header().Set("Content-Type", "application/rss+xml; charset=utf-8")
-		w.Header().Set("ETag", rRepo.Etag)
-		http.ServeContent(w, r, "feed.xml", rRepo.ModifiedAt, rRepo.Feed())
+		w.Header().Set("ETag", rRepo.Etag())
+		http.ServeContent(w, r, "feed.xml", rRepo.ModifiedAt(), rRepo.Feed())
 	})
 	server := http.Server{
 		Addr:    ":8080",

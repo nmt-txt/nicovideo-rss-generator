@@ -13,15 +13,15 @@ import (
 // 生成と読取りは別goroutineで行われるためMutexを使う必要があり、dataプロパティを直接読むことは許可されない。
 type RSSRepository struct {
 	data       []byte
-	ModifiedAt time.Time
-	Etag       string
+	modifiedAt time.Time
+	etag       string
 	mu         sync.RWMutex
 }
 
 func NewRSSRepository() *RSSRepository {
 	return &RSSRepository{
 		data:       []byte{},
-		ModifiedAt: time.Now(),
+		modifiedAt: time.Now(),
 	}
 }
 
@@ -35,6 +35,18 @@ func (r *RSSRepository) SetFeed(data []byte) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	r.data = data
-	r.ModifiedAt = time.Now()
-	r.Etag = fmt.Sprintf("W/%d-%x", len(data), crc32.ChecksumIEEE(data))
+	r.modifiedAt = time.Now()
+	r.etag = fmt.Sprintf("W/%d-%x", len(data), crc32.ChecksumIEEE(data))
+}
+
+func (r *RSSRepository) ModifiedAt() time.Time {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	return r.modifiedAt
+}
+
+func (r *RSSRepository) Etag() string {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	return r.etag
 }
