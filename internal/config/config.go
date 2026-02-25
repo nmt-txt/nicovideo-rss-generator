@@ -39,7 +39,7 @@ func LoadConfig(fileContents []byte) (*Config, error) {
 	var cfg Config
 	// デフォルト設定
 	cfg.Log = "info"
-	cfg.System = System{Version: "1.0.1"}
+	cfg.System = System{Version: "1.1.0"}
 	cfg.RssGenerator = RssGenerator{
 		Title:                       "Nicovideo RSS DIY",
 		Description:                 "ニコニコ動画新着RSS(自作)",
