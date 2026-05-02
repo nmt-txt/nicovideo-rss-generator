@@ -26,6 +26,7 @@ var (
 	ErrRespQueryParse   = errors.New("リクエストに不正なパラメーターがあります")
 	ErrRespInternal     = errors.New("サーバーの異常です。")
 	ErrRespMaintainance = errors.New("サービスがメンテナンス中です。メンテナンス終了までお待ち下さい。")
+	ErrNotFound         = errors.New("見つかりませんでした。削除済みの可能性があります。")
 )
 
 func NewVideoClient(baseURL string, userAgent string) *VideoClient {
@@ -203,6 +204,8 @@ func (c *ThumbnailClient) FetchThumbnailMeta(ctx context.Context, thumbnailURL s
 		return nil, fmt.Errorf("サムネイル情報取得に失敗しました: %w", ErrRespInternal)
 	case http.StatusServiceUnavailable:
 		return nil, fmt.Errorf("サムネイル情報取得に失敗しました: %w", ErrRespMaintainance)
+	case http.StatusNotFound:
+		return nil, fmt.Errorf("サムネイル情報取得に失敗しました: %w", ErrNotFound)
 	default:
 		return nil, fmt.Errorf("サムネイル情報取得に不明なエラーで失敗しました: HTTP %d %s", resp.StatusCode, resp.Status)
 	}

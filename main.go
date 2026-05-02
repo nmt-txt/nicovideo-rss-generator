@@ -234,18 +234,22 @@ func worker(
 					slog.Error(err.Error())
 					slog.Debug(fmt.Sprintf("%d", i))
 
-					errorCount++
-					if errorCount >= ERROR_KEEPON_THRESHOLD {
-						nRepo.AddNotification(
-							repository.NotificationError,
-							"サムネイル画像情報取得の際に連続でエラーが発生しました。次回取得はクールダウン後になります。",
-							err,
-							true,
-						)
-						break LOOP
-					}
-					continue
+					// 動画削除されたときはサムネイルは404になる。これに限ってはエラー扱いしてサムネイル取得を中断すべきではない
+					if !errors.Is(err, client.ErrNotFound) {
+						errorCount++
 
+						if errorCount >= ERROR_KEEPON_THRESHOLD {
+							slog.Error("サムネイル情報取得エラー回数が上限を超えました。サムネイル情報取得を中断します")
+							nRepo.AddNotification(
+								repository.NotificationError,
+								"サムネイル画像情報取得の際に連続でエラーが発生しました。次回取得はクールダウン後になります。",
+								err,
+								true,
+							)
+							break LOOP
+						}
+						continue
+					}
 				}
 
 				errorCount = 0
