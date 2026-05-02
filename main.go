@@ -128,8 +128,8 @@ func worker(
 	rRepo *repository.RSSRepository,
 	cfg *config.Config,
 ) {
-	vClient := client.NewVideoClient("https://snapshot.search.nicovideo.jp/api/v2/snapshot", fmt.Sprintf("nicovideo-rss-diy/%s service", cfg.System.Version))
-	tClient := client.NewThumbnailClient(fmt.Sprintf("nicovideo-rss-diy/%s service", cfg.System.Version))
+	vClient := client.NewVideoClient("https://snapshot.search.nicovideo.jp/api/v2/snapshot", fmt.Sprintf("nicovideo-rss-generator/%s service", cfg.System.Version))
+	tClient := client.NewThumbnailClient(fmt.Sprintf("nicovideo-rss-generator/%s service", cfg.System.Version))
 
 	// queriesに基づき動画検索を行いvRepoに追加する。クエリとクエリの間に1分待機する
 	doVideo := func(
