@@ -12,7 +12,8 @@ type SearchQuery struct {
 }
 
 type System struct {
-	Version string
+	Version        string `json:"-"`
+	SnapShotAPIURL string `json:"snapShotAPIURL"`
 }
 
 type RssGenerator struct {
@@ -29,7 +30,7 @@ type VideoFetcher struct {
 type Config struct {
 	SearchQueries []SearchQuery `json:"searchQueries"`
 	Log           string        `json:"log,omitempty"`
-	System        System        `json:"-"`
+	System        System        `json:"system"`
 	RssGenerator  RssGenerator  `json:"rssGenerator"`
 	VideoFetcher  VideoFetcher  `json:"videoFetcher"`
 }
@@ -39,7 +40,7 @@ func LoadConfig(fileContents []byte) (*Config, error) {
 	var cfg Config
 	// デフォルト設定
 	cfg.Log = "info"
-	cfg.System = System{Version: "1.1.0"}
+	cfg.System = System{Version: "1.1.0", SnapShotAPIURL: "https://snapshot.search.nicovideo.jp/api/v2/snapshot"}
 	cfg.RssGenerator = RssGenerator{
 		Title:                       "Nicovideo RSS DIY",
 		Description:                 "ニコニコ動画新着RSS(自作)",

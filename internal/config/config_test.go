@@ -116,4 +116,9 @@ func TestLoadConfig_DefaultFallBack(t *testing.T) {
 	if cfg.VideoFetcher.ShouldFetchThumbnail {
 		t.Fatalf("expected default shouldFetchThumbnail to be false")
 	}
+
+	// System デフォルト確認(Ver不要, それ以外)
+	if cfg.System.SnapShotAPIURL != "https://snapshot.search.nicovideo.jp/api/v2/snapshot" {
+		t.Fatalf("expected default SnapShotAPIURL, got %q", cfg.System.SnapShotAPIURL)
+	}
 }
