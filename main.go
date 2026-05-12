@@ -231,7 +231,7 @@ func worker(
 				reqEndAt := time.Now()
 				cancel()
 				if err != nil {
-					slog.Error(err.Error())
+					slog.Error(fmt.Sprintf("%s(%s)", err.Error(), v.ID))
 					slog.Debug(fmt.Sprintf("%d", i))
 
 					// 動画削除されたときはサムネイルは404になる。これに限ってはエラー扱いしてサムネイル取得を中断すべきではない
@@ -248,17 +248,18 @@ func worker(
 							)
 							break LOOP
 						}
-						continue
 					}
+				} else {
+					// 下にあるリクエスト間waitは成否に関わらず行わねばならない、とすればエラーがあったときもif err!=nilを貫通して下まで降りて来させることになり、
+					// elseの中にエラーがなかったときの処理を入れなければならない
+					errorCount = 0
+
+					v.ThumbnailType = thumbMeta.Type
+					v.ThumbnailLength = thumbMeta.Length
+
+					thumbnailFetchedCountForAvr++
+					thumbnailFetchedCountTotal++
 				}
-
-				errorCount = 0
-
-				v.ThumbnailType = thumbMeta.Type
-				v.ThumbnailLength = thumbMeta.Length
-
-				thumbnailFetchedCountForAvr++
-				thumbnailFetchedCountTotal++
 
 				reqTime := reqEndAt.Sub(reqBeginAt)
 				if i < len(vRepo.Videos)-1 {
